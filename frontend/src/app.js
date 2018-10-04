@@ -14,10 +14,13 @@ const express = require('express');
 const Youch = require('youch');
 const combinedReducers = require('./reducers')
 
+const React = require('react');
+const ReactDOMServer = require('react-dom/server');
+const _ = require('lodash');
 const api = require('./helpers/api');
 const createStore = require('./helpers/createStore');
-//const Root = React.createFactory(require('./components/Root'));
-//const combinedReducers = require('./reducers');
+const Root = React.createFactory(require('./components/Root'));
+
 // Create a new Express app
 const app = express();
 
@@ -32,7 +35,7 @@ app.use('/assets/font-awesome/fonts', express.static(
 // Set up the index route
 app.get('/', (req, res) => {
    //
-   api.get('api/notebooks').then((notebook) => {
+   api.get('/notebooks').then((notebooks) => {
     const initialState = combinedReducers();
     initialState.notebooks.visibleNotebooks = notebooks;
     const initialStateString =JSON.stringify(initialState).replace(/<\//g, "<\\/");
@@ -63,7 +66,7 @@ app.get('/', (req, res) => {
 
   // Respond with the complete HTML page
   res.send(htmlDocument);
-  res.send(htmlDocument);
+
   } catch(ex) {
     console.error(ex.stack);
     res.status(500).send(ex.stack);
@@ -74,13 +77,13 @@ app.get('/', (req, res) => {
   });
 });
 // Catch-all for handling errors.
-app.use((err, req, res, next) => {
+/*app.use((err, req, res, next) => {
   console.error(err.stack);
   if(res.headersSent) {
     return next(err);
   }
   const youch = new Youch(err, req);
   youch.toHTML().then(html => res.send(html));
-});
+});*/
 
 module.exports = app;

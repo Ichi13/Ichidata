@@ -5,9 +5,13 @@ const api = require('../helpers/api');
 /* *** TODO: Put action constants here *** */
 
 const initialState = {
-  data: [
-    { id: 100, title: 'From Redux Store: A hard-coded notebook' },
-    { id: 101, title: 'From Redux Store: Another hard-coded notebook' },
+  visibleNotebooks: [
+    {
+      activeNotebookId: -1,
+      activeNote: null,
+      notes: [],
+    }
+
   ]
 };
 

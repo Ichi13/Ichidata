@@ -11,6 +11,11 @@ const notebooksActionCreators = require('../reducers/notebooks');
   you will need to build upon it in order to complete the assignment.
 */
 class NotebookList extends React.Component {
+   constructor(props) {
+    super(props);
+    // Set initial internal state for this component
+    this.state = { loading: false };
+  }
   render() {
     const createNotebookListItem = (notebook) => {
       return (
@@ -24,7 +29,8 @@ class NotebookList extends React.Component {
       <div>
         <h2>Notebooks</h2>
         <ul>
-          {this.props.notebooks.data.map(createNotebookListItem)}
+
+          {this.props.notebooks.visibleNotebooks.map(createNotebookListItem)}
         </ul>
       </div>
     );
