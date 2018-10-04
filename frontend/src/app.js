@@ -36,8 +36,10 @@ app.use('/assets/font-awesome/fonts', express.static(
 app.get('/', (req, res) => {
    //
    api.get('/notebooks').then((notebooks) => {
+
     const initialState = combinedReducers();
     initialState.notebooks.visibleNotebooks = notebooks;
+
     const initialStateString =JSON.stringify(initialState).replace(/<\//g, "<\\/");
   try {
     const store = createStore(initialState);
