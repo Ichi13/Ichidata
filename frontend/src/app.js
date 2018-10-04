@@ -12,7 +12,12 @@
 const path = require('path');
 const express = require('express');
 const Youch = require('youch');
+const combinedReducers = require('./reducers')
 
+const api = require('./helpers/api');
+const createStore = require('./helpers/createStore');
+//const Root = React.createFactory(require('./components/Root'));
+//const combinedReducers = require('./reducers');
 // Create a new Express app
 const app = express();
 
@@ -23,8 +28,21 @@ app.use('/assets', express.static(path.join(__dirname, '..', 'dist')));
 app.use('/assets/font-awesome/fonts', express.static(
   path.dirname(require.resolve('font-awesome/fonts/FontAwesome.otf'))));
 
+
 // Set up the index route
 app.get('/', (req, res) => {
+   //
+   api.get('api/notebooks').then((notebook) => {
+    const initialState = combinedReducers();
+    initialState.notebooks.visibleNotebooks = notebooks;
+    const initialStateString =JSON.stringify(initialState).replace(/<\//g, "<\\/");
+  try {
+    const store = createStore(initialState);
+    // Create the root React component
+    const rootComponent = Root({ store });
+    // Render the root component to a HTML string
+    const reactHtml = ReactDOMServer.renderToString(rootComponent);
+
   const htmlDocument = `<!DOCTYPE html>
     <html lang="en">
       <head>
@@ -39,14 +57,22 @@ app.get('/', (req, res) => {
       </head>
       <body>
         <div id="root"></div>
-        <script>main();</script>
+        <script>main(${initialStateString});</script>
       </body>
     </html>`;
 
   // Respond with the complete HTML page
   res.send(htmlDocument);
+  res.send(htmlDocument);
+  } catch(ex) {
+    console.error(ex.stack);
+    res.status(500).send(ex.stack);
+  }
+ }).catch((err) => {
+    console.error(err.stack);
+    res.status(500).send('Request to API failed.');
+  });
 });
-
 // Catch-all for handling errors.
 app.use((err, req, res, next) => {
   console.error(err.stack);
