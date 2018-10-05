@@ -17,10 +17,13 @@ class NotebookList extends React.Component {
     this.state = { loading: false };
   }
   render() {
-    const createNotebookListItem = (notebook) => {
+    const createNotebookListItem = (Notebook) => {
       return (
-        <li key={notebook.id}>
-          {notebook.title}
+
+        <li key={Notebook.id}>
+          <Notebook
+            Notebook={Notebook}
+          />
         </li>
       )
     }
