@@ -44,8 +44,8 @@ function reducer(state, action) {
     // Changes a single post's data in the local store
     case CHANGE: {
       const visiblePosts = _.clone(state.visiblePosts);
-      const changedIndex = _.findIndex(state.visiblePosts, {id: action.post.id })
-      visiblePosts[changedIndex] = action.post;
+      const changedIndex = _.findIndex(state.visiblePosts, {id: action.Notebook.id })
+      visiblePosts[changedIndex] = action.Notebook;
       return _.assign({}, state, { visiblePosts });
     }
 
