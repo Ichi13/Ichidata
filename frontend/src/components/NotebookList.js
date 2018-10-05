@@ -24,6 +24,7 @@ class NotebookList extends React.Component {
         <li key={notebook.id}>
           <Notebook
             Notebook={notebook}
+            deleteNotebook={this.props.deleteNotebook}
           />
         </li>
       )

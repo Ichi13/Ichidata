@@ -48,7 +48,7 @@ class Notebook extends React.Component {
       <NotebookView
         notebook={this.props.Notebook}
         time={this.props.time}
-         onDelete={deleteThisNotebook}
+        onDelete={deleteThisNotebook}
         onEdit={openEdit}
       />
     );

@@ -51,8 +51,8 @@ function reducer(state, action) {
 
     // Removes a single post from the visible post list
     case REMOVE: {
-      const visiblePosts = _.reject(state.visiblePosts, {id: action.id});
-      return _.assign({}, state, { visiblePosts });
+      const visibleNotebooks = _.reject(state.visibleNotebooks, {id: action.NotebookId});
+      return _.assign({}, state, { visibleNotebooks });
     }
 
     default: return state;
@@ -79,7 +79,7 @@ reducer.deleteNotebook = (NotebookId) => {
    return (dispatch) => {
     api.delete('/Notebooks/' + NotebookId ).then(() => {
       // Saves local Notebook.
-      dispatch(reducer.removePost(NotebookId));
+      dispatch(reducer.removeNotebook(NotebookId));
     }).catch(() => {
       alert('Failed to delete Notebook.  Are all of the fields filled in correctly?');
     });
