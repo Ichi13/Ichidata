@@ -47,7 +47,6 @@ class Note extends React.Component {
     return (
       <NoteView
         Note={this.props.Note}
-        time={this.props.time}
          onDelete={deleteThisNote}
         onEdit={openEdit}
       />

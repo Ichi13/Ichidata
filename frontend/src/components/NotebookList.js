@@ -1,5 +1,6 @@
 const React = require('react');
 const ReactRedux = require('react-redux');
+const Notebook = require('./Notebook');
 
 const createActionDispatchers = require('../helpers/createActionDispatchers');
 const notebooksActionCreators = require('../reducers/notebooks');
@@ -17,12 +18,12 @@ class NotebookList extends React.Component {
     this.state = { loading: false };
   }
   render() {
-    const createNotebookListItem = (Notebook) => {
+    const createNotebookListItem = (notebook) => {
       return (
 
-        <li key={Notebook.id}>
+        <li key={notebook.id}>
           <Notebook
-            Notebook={Notebook}
+            Notebook={notebook}
           />
         </li>
       )

@@ -2,7 +2,7 @@ const React = require('react');
 const ReactRedux = require('react-redux');
 const _ = require('lodash');
 
-const NotesActionCreators = require('../reducers/Notes');
+const notesActionCreators = require('../reducers/notes');
 const createActionDispatchers = require('../helpers/createActionDispatchers');
 const Note = require('./Note');
 const NoteNew = require('./NoteNew');
@@ -12,23 +12,25 @@ const NoteNew = require('./NoteNew');
  * and loading more Notes.
  */
 class NoteList extends React.Component {
-  constructor(props) {
-    super(props);
-    // Set initial internal state for this component
-    this.state = { loading: false };
-  }
+  // constructor(props) {
+  //   super(props);
+  //   // Set initial internal state for this component
+  //   this.state = { loading: false };
+  // }
 
   render() {
-    const onLoadButtonClick = () => {
-      // If we are not already in the process of loading Notes,
-      // start loading more Notes.
-      if(!this.state.loading) {
-        this.setState({ loading: true });
-        this.props.loadMoreNotes(() => {
-          this.setState({ loading: false });
-        });
-      }this.props.Notes.visibleNotes
-    };
+    // const onLoadButtonClick = () => {
+    //   // If we are not already in the process of loading Notes,
+    //   // start loading more Notes.
+    //   if(!this.state.loading) {
+    //     this.setState({ loading: true });
+    //     this.props.loadMoreNotes(() => {
+    //       this.setState({ loading: false });
+    //     });
+    //   }//this.props.Notes.visibleNotes
+    // };
+
+
 
     // Function which creates a Note component from a Note ID
     const createNoteComponent = (currentNote) => {
@@ -37,12 +39,12 @@ class NoteList extends React.Component {
         <Note
           key={currentNote.id}
           Note={currentNote}
-          time={this.props.time}
           saveNote={this.props.saveNote}
           deleteNote={this.props.deleteNote}
         />
       );
     };
+
 
     return (
       <div className="row">
@@ -54,15 +56,15 @@ class NoteList extends React.Component {
 
           {/* TODO Section 3: Write code to list all the Notes */}
 
-           {this.props.Notes.visibleNotes.map(p => createNoteComponent(p))}
+           {this.props.notes.visibleNotes.map(p => createNoteComponent(p))}
 
           {/* Button for loading more Notes */}
-          <button className="blog-load-more btn btn-default btn-lg"
+          {/*<button className="blog-load-more btn btn-default btn-lg"
             onClick={onLoadButtonClick}
             disabled={this.state.loading}
           >
             {this.state.loading ? 'Loading...' : 'Load more Notes'}
-          </button>
+          </button>*/}
         </div>
       </div>
     );
@@ -73,10 +75,9 @@ class NoteList extends React.Component {
 const NoteListContainer = ReactRedux.connect(
   // Map store state to props
   (state) => ({
-    Notes: state.Notes,
-    time: state.time
+    notes: state.notes,
   }),
-  createActionDispatchers(NotesActionCreators)
+  createActionDispatchers(notesActionCreators)
 )(NoteList);
 
 module.exports = NoteListContainer;

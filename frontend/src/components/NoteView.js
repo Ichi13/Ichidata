@@ -24,7 +24,6 @@ const NoteMeta = (props) => {
         >
       <span className="fa fa-remove" />
        </a>
-      { moment(props.Note.createdAt).from(props.time.now) }
     </div>
   );
 };

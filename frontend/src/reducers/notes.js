@@ -5,11 +5,11 @@ const api = require('../helpers/api');
 // The initial state of blog post data
 const initialState = {
   visibleNotes: [
-    { activeNoteId: -1,
-      activeNote: null,
-      notes: [],
+    {
+      title: "First note",
+      content: "stuff",
+      notebookId: 1
     }
-
   ]
 };
 
