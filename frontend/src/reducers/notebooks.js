@@ -1,148 +1,112 @@
 const _ = require('lodash');
 const api = require('../helpers/api');
+const notesActionReducer = require('./notes');
 
-// Action type constants
-// Action type constants
-const INSERT = 'blog-frontend/Notebooks/INSERT';
-const CHANGE = 'blog-frontend/Notebooks/CHANGE';
-const REMOVE = 'blog-frontend/Notebooks/REMOVE';
-/* *** TODO: Put action constants here *** */
+const INSERT = 'blog-frontend/notebooks/INSERT';
+const CHANGE = 'blog-frontend/notebooks/CHANGE';
+const REMOVE = 'blog-frontend/notebooks/REMOVE';
+const SET_ACTIVE = 'blog-frontend/notebooks/SET_ACTIVE';
+
+
 
 const initialState = {
-  visibleNotebooks: [
-    {
-      activeNotebookId: -1,
-      activeNote: null,
-      notes: [],
-    }
-
-  ]
+  data: [
+    { id: 5,
+      title: "Example 1",
+      createdAt: "2018-10-11T23:26:36.000Z",
+      updatedAt: "2018-10-11T23:26:36.000Z"
+    },
+    {id: 4,
+     title: "Example 2",
+     createdAt: "2018-10-11T23:18:08.000Z",
+     updatedAt: "2018-10-11T23:18:08.000Z"
+    },
+  ],
+  activeNotebookId: -1,
+  notes: [],
 };
 
-// Function which takes the current data state and an action,
-// and returns a new state
 function reducer(state, action) {
   state = state || initialState;
   action = action || {};
 
   switch(action.type) {
-    /* *** TODO: Put per-action code here *** */
- case INSERT: {
 
-
-      // Add in the new posts
-      // Notice that we do not need to increment the post id. Since the post that we
-      // are putting in is one that is returned by the api server which already has
-      // the id incremented.
-      const unsortedPosts = _.concat(state.visiblePosts, action.posts);
-
-      const visiblePosts = _.orderBy(unsortedPosts, 'createdAt','desc');
-
-      // Return updated state
-      return _.assign({}, state, { visiblePosts} );
+    case INSERT: {
+      const unsortedNotebooks = _.concat(state.data, action.notebooks);
+      const data = _.orderBy(unsortedNotebooks, 'createdAt','desc');
+      return _.assign({}, state, {data} );
     }
-    // Changes a single post's data in the local store
     case CHANGE: {
-      const visiblePosts = _.clone(state.visiblePosts);
-      const changedIndex = _.findIndex(state.visiblePosts, {id: action.Notebook.id })
-      visiblePosts[changedIndex] = action.Notebook;
-      return _.assign({}, state, { visiblePosts });
+      const data = _.clone(state.data);
+      const changedIndex = _.findIndex(state.data, {id: action.notebook.id })
+      data[changedIndex] = action.notebook;
+      return _.assign({}, state, {data});
     }
-
-    // Removes a single post from the visible post list
     case REMOVE: {
-      const visibleNotebooks = _.reject(state.visibleNotebooks, {id: action.NotebookId});
-      return _.assign({}, state, { visibleNotebooks });
+      const data = _.reject(state.data, {id: action.id});
+      return _.assign({}, state, {data});
+    }
+    case SET_ACTIVE: {
+    	return _.assign({}, state, { activeNotebookId: action.notebookId });
     }
 
     default: return state;
   }
 }
 
-// Action creators
-/* *** TODO: Put action creators here *** */
 
-// Inserts Notebooks into the Notebook list
-reducer.insertNotebook = (Notebooks) => {
-  return { type: INSERT, NotebooksId };
+reducer.insertNotebooks = (notebooks) => {
+  return { type: INSERT, notebooks };
 };
 
-// Removes a Notebook from the visible Notebook list
-reducer.removeNotebook = (NotebookId) => {
-  return { type: REMOVE, NotebookId };
+reducer.removeNotebook = (id) => {
+  return { type: REMOVE, id };
 };
 
-// Attempts to delete a Notebook from the server and removes it from the visible
-// Notebook list if successful
-reducer.deleteNotebook = (NotebookId) => {
-   // TODO Section 8: Add code to perform delete
+reducer.deleteNotebook = (notebookId) => {
    return (dispatch) => {
-    api.delete('/Notebooks/' + NotebookId ).then(() => {
-      // Saves local Notebook.
-      dispatch(reducer.removeNotebook(NotebookId));
-    }).catch(() => {
-      alert('Failed to delete Notebook.  Are all of the fields filled in correctly?');
-    });
-  };
+     api.delete('/notebooks/'+ notebookId)
+     .then(() => {notesActionReducer
+       dispatch(reducer.removeNotebook(notebookId));
+     }).catch(() => {
+       alert('Failed to delete');
+     });
+   };
 };
 
-// Attempts to update a Notebook on the server and updates local Notebook data if
-// successful
 reducer.saveNotebook = (editedNotebook, callback) => {
   return (dispatch) => {
-    api.put('/Notebooks/' + editedNotebook.id, editedNotebook).then((Notebook) => {
-      // Saves local Notebook.
-      dispatch(reducer.changeNotebook(Notebook));
+    api.put('/notebooks/' + editedNotebook.id, editedNotebook).then((notebook) => {
+      dispatch(reducer.changeNotebook(notebook));
       callback();
     }).catch(() => {
-      alert('Failed to save Notebook.  Are all of the fields filled in correctly?');
+      alert('Failed to save notebook.');
     });
   };
 };
 
-// Attempts to create a Notebook on the server and inserts it into the local Notebook
-// list if successful
+
 reducer.createNotebook = (newNotebook, callback) => {
   return (dispatch) => {
-    api.Notebook('/Notebooks', newNotebook).then((Notebook) => {
-      // This Notebook is one that the store returns us! It has Notebook id incremented to the next available id
-      dispatch(reducer.insertNotebooks([Notebook]));
+    api.post('/notebooks', newNotebook).then((notebook) => {
+      dispatch(reducer.insertNotREMOVEebooks([notebook]));
       callback();
     }).catch(() => {
-      alert('Failed to create Notebook. Are all of the fields filled in correctly?');
+      alert('Failed to create notebook.');
     });
   };
 };
 
-// Changes local Notebook data
-reducer.changeNotebook = (Notebook) => {
-  return { type: CHANGE, Notebook };
+reducer.changeNotebook = (notebook) => {
+  return { type: CHANGE, notebook };
 };
 
-// Attempts to load more Notebooks from the server and inserts them into the local
-// Notebook list if successful
-reducer.loadMoreNotebooks = (callback) => {
-  return (dispatch, getState) => {
-    const state = _.assign({}, initialState, getState().Notebooks);
-
-    let path = '/Notebooks';
-    if (state.visiblePosts.length > 0) {
-        const oldestPost =_.last(state.visiblePosts);
-        path = '/Notebooks?olderThan=' + oldestPost.createdAt;
-    }
-    api.get(path).then((newPosts) => {
-      dispatch(reducer.insertNotebooks(newPosts));
-      callback();
-    }).catch(() => {
-      alert('Failed to load more Notebooks');
-      callback('Failed to load more Notebooks');
-    });
-
+reducer.loadData = (notebookId) => {
+	return (dispatch) => {
+      dispatch({ type: SET_ACTIVE, notebookId });
+      dispatch(notesActionReducer.loadNotes(notebookId));
   };
-
-
 };
 
-// Export the action creators and reducer
 module.exports = reducer;
-

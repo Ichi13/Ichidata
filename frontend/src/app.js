@@ -12,14 +12,9 @@
 const path = require('path');
 const express = require('express');
 const Youch = require('youch');
-const combinedReducers = require('./reducers')
 
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
-const _ = require('lodash');
 const api = require('./helpers/api');
-const createStore = require('./helpers/createStore');
-const Root = React.createFactory(require('./components/Root'));
+const combinedReducers = require('./reducers');
 
 // Create a new Express app
 const app = express();
@@ -31,22 +26,17 @@ app.use('/assets', express.static(path.join(__dirname, '..', 'dist')));
 app.use('/assets/font-awesome/fonts', express.static(
   path.dirname(require.resolve('font-awesome/fonts/FontAwesome.otf'))));
 
-
 // Set up the index route
 app.get('/', (req, res) => {
-   //
-   api.get('/notebooks').then((notebooks) => {
+  api.get('/notebooks').then((notebooks) => {
 
-    const initialState = combinedReducers();
-    initialState.notebooks.visibleNotebooks = notebooks;
+  const initialState = combinedReducers();
+  initialState.notebooks.data = notebooks;
+  const initialStateString = JSON.stringify(initialState).replace(/<\//g, "<\\/");
 
-    const initialStateString =JSON.stringify(initialState).replace(/<\//g, "<\\/");
-  try {
-    const store = createStore(initialState);
-    // Create the root React component
-    const rootComponent = Root({ store });
-    // Render the root component to a HTML string
-    const reactHtml = ReactDOMServer.renderToString(rootComponent);
+
+
+
 
   const htmlDocument = `<!DOCTYPE html>
     <html lang="en">
@@ -69,23 +59,17 @@ app.get('/', (req, res) => {
   // Respond with the complete HTML page
   res.send(htmlDocument);
 
-  } catch(ex) {
-    console.error(ex.stack);
-    res.status(500).send(ex.stack);
-  }
- }).catch((err) => {
-    console.error(err.stack);
-    res.status(500).send('Request to API failed.');
   });
 });
+
 // Catch-all for handling errors.
-/*app.use((err, req, res, next) => {
+app.use((err, req, res, next) => {
   console.error(err.stack);
   if(res.headersSent) {
     return next(err);
   }
   const youch = new Youch(err, req);
   youch.toHTML().then(html => res.send(html));
-});*/
+});
 
 module.exports = app;

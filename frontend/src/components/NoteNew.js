@@ -1,13 +1,10 @@
 const React = require('react');
 const NoteEdit = require('./NoteEdit');
 
-/**
- * A button which expands into a form for writing a new Note.
- */
+
 class NoteNew extends React.Component {
   constructor(props) {
     super(props);
-    // Set initial internal state for this component
     this.state = { editing: false };
   }
 
@@ -26,22 +23,20 @@ class NoteNew extends React.Component {
       });
     };
 
-    // TODO Section 7: Write code to switch to edit mode when editing is clicked
-    if(this.state.editing ) {
-      // Render component for editing the Note
+    if(this.state.editing) {
       return (
         <NoteEdit
-          Note={this.props.Note}
+          note={this.props.note}
           onSave={createNote}
           onCancel={closeEdit}
+          notebookId={this.props.notebookId}
         />
       );
     }
+
     return (
-      <button className="blog-load-more btn btn-primary btn-lg"
-        onClick={ openEdit }
-      >
-        Write new Note
+      <button onClick={ openEdit } >
+        + New note
       </button>
     );
   }

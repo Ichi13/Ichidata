@@ -1,49 +1,45 @@
 const React = require('react');
 const moment = require('moment');
+const NoteList = require('./NoteList');
 
-/**
- * Render edit/delete buttons and post timestamp.
- *
- * List of props: notebook, time, onEdit, onDelete
- */
 const NotebookMeta = (props) => {
   return (
-    <div className="notebook-meta">
-      <a role="button" title="Edit notebook"
-        style={{ paddingRight: '8px' }}
-        onClick={ props.onEdit }
-      >
-        <span className="fa fa-edit" />
-      </a>
+    <div className="blog-notebook-meta">
 
       <a role="button" title="Delete notebook"
-         style={{ paddingRight: '8px' }}
-         onClick={ props.onDelete }
-       >
-       <span className="fa fa-remove" />
-      </a>
-
+        onClick={props.onDelete}>
+      <span className="fa fa-remove" />
+        </a>
     </div>
   );
 };
 
-/**
- * A read-only view of a notebook.
- * This is a stateless functional component.
- * It takes props as its args and returns what the render method would return.
- *
- * List of props: notebook, time, onEdit, onDelete
- */
-const NotebookView = (props) => {
+class NotebookView extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+
+  render() {
+      const onClickNotebook = (event) => {
+    	event.preventDefault();
+    	this.props.loadData(this.props.notebook.id);
+  };
+
   return (
-    <div className="newNotebook">
-      <a href=""><h2 className="notebook-title">{props.notebook.title}</h2></a>
+    <div className="blog-notebook">
+      <h3 className="blog-notebook-title">
+        <a onClick={onClickNotebook}>
+        <li>{this.props.notebook.title}</li>
+        </a>
+      </h3>
 
-      {/* Display notebook metadata */}
-        {NotebookMeta(props)}
-
+      <NotebookMeta {...this.props}/>
     </div>
   );
 };
+}
+
+
 
 module.exports = NotebookView;

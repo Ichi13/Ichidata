@@ -4,10 +4,12 @@
  */
 
 const Redux = require('redux');
+const notebooks = require('./notebooks');
+const notes = require('./notes');
 
 module.exports = Redux.combineReducers({
-  notebooks: require('./notebooks'),
-  notes: require('./notes'),
+  notebooks,
+  notes
   /* *** TODO: Put any other reducers in here *** */
   // eg. `notes: require('./notes')` if you have a reducer in reducers/notes.js
 });

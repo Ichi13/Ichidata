@@ -1,83 +1,74 @@
 const React = require('react');
 const ReactRedux = require('react-redux');
-const _ = require('lodash');
+const _ = require('lodash');//*
 
-const notesActionCreators = require('../reducers/notes');
 const createActionDispatchers = require('../helpers/createActionDispatchers');
-const Note = require('./Note');
-const NoteNew = require('./NoteNew');
-
-/**
- * A list of blog Notes, along with buttons for writing a new Note
- * and loading more Notes.
- */
+const notesActionCreators = require('../reducers/notes');
+const notebooksActionCreators = require('../reducers/notebooks');
+const Note = require('./Note');//*
+const NoteNew = require('./NoteNew');//*
+/*
+  *** TODO: Build more functionality into the NoteList component ***
+  At the moment, the NoteList component simply renders the notes
+  as a plain list containing their titles. This code is just a starting point,
+  you will need to build upon it in order to complete the assignment.
+*/
 class NoteList extends React.Component {
-  // constructor(props) {
-  //   super(props);
-  //   // Set initial internal state for this component
-  //   this.state = { loading: false };
-  // }
+  constructor(props) {//*
+    super(props);
+    this.state = { loading: false };
+  }
 
   render() {
-    // const onLoadButtonClick = () => {
-    //   // If we are not already in the process of loading Notes,
-    //   // start loading more Notes.
-    //   if(!this.state.loading) {
-    //     this.setState({ loading: true });
-    //     this.props.loadMoreNotes(() => {
-    //       this.setState({ loading: false });
-    //     });
-    //   }//this.props.Notes.visibleNotes
-    // };
+    const onLoadButtonClick = () => {
+      if(!this.state.loading) {
+        this.setState({ loading: true });
+        this.props.loadMorePosts(() => {
+          this.setState({ loading: false });
+        });
+      }
+    };
 
+    const createNoteListItem = (note) => {
 
-
-    // Function which creates a Note component from a Note ID
-    const createNoteComponent = (currentNote) => {
-      /* TODO Section 8: Add code for delete */
-      return (
+     return (
         <Note
-          key={currentNote.id}
-          Note={currentNote}
+          key={note.id}
+          note={note}
           saveNote={this.props.saveNote}
           deleteNote={this.props.deleteNote}
+          notebookId={this.props.notebooks.activeNotebookId}
         />
       );
     };
 
-
     return (
       <div className="row">
         <div className="blog-main">
-          {/* Button for writing a new Note */}
+          <h2>Notes</h2>
           <NoteNew
-            createNote={this.props.createNote}
-          />
+              createNote={this.props.createNote}
+              notebookId={this.props.notebooks.activeNotebookId}
+            />
 
-          {/* TODO Section 3: Write code to list all the Notes */}
+          <ul>
+            {this.props.notes.notes.map(createNoteListItem)}
 
-           {this.props.notes.visibleNotes.map(p => createNoteComponent(p))}
-
-          {/* Button for loading more Notes */}
-          {/*<button className="blog-load-more btn btn-default btn-lg"
-            onClick={onLoadButtonClick}
-            disabled={this.state.loading}
-          >
-            {this.state.loading ? 'Loading...' : 'Load more Notes'}
-          </button>*/}
+          </ul>
         </div>
       </div>
+
     );
   }
 }
 
-// Connect NoteList component to the Redux store
 const NoteListContainer = ReactRedux.connect(
-  // Map store state to props
-  (state) => ({
+  state => ({
     notes: state.notes,
+    notebooks: state.notebooks,
+    data: state.data,
   }),
-  createActionDispatchers(notesActionCreators)
+  createActionDispatchers(notesActionCreators, notebooksActionCreators)
 )(NoteList);
 
 module.exports = NoteListContainer;
