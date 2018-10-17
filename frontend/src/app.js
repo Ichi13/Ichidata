@@ -11,16 +11,24 @@
 
 const path = require('path');
 const express = require('express');
-const Youch = require('youch');
 
+const React = require('react');
+const ReactDOMServer = require('react-dom/server');
+const _ = require('lodash');
+const moment = require('moment');
 const api = require('./helpers/api');
+const createStore = require('./helpers/createStore');
+const Root = React.createFactory(require('./components/Root'));
 const combinedReducers = require('./reducers');
+
 
 // Create a new Express app
 const app = express();
 
+
 // Serve up our static assets from 'dist/'
-app.use('/assets', express.static(path.join(__dirname, '..', 'dist')));
+app.use('/assets', express.static(path.join(__dirname,
+        '..', 'dist')));
 
 // Serve up font-awesome fonts from vendor folder
 app.use('/assets/font-awesome/fonts', express.static(
@@ -28,48 +36,49 @@ app.use('/assets/font-awesome/fonts', express.static(
 
 // Set up the index route
 app.get('/', (req, res) => {
-  api.get('/notebooks').then((notebooks) => {
 
-  const initialState = combinedReducers();
-  initialState.notebooks.data = notebooks;
-  const initialStateString = JSON.stringify(initialState).replace(/<\//g, "<\\/");
+  api.get('/notes').then((notes) => {
+   api.get('/notebooks').then((notebooks) => {
+        try {
 
+            const initialState = combinedReducers();
+            initialState.notebooks.visibleNotebooks = notebooks;
+            initialState.notes.visibleNotes = notes;
+            const initialStateString = JSON.stringify(initialState).replace(/<\//g, "<\\/");
 
+          const htmlDocument = `<!DOCTYPE html>
+            <html lang="en">
+              <head>
+                <meta charset="utf-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
 
+                <title>Neverwrote</title>
+                <link rel="stylesheet" type="text/css" href="/assets/css/app.css">
+                <script src="/assets/js/vendor.js"></script>
+                <script src="/assets/js/app.js"></script>
+              </head>
+              <body>
+                <div id="root"></div>
+                <script>window.main(${initialStateString});</script>
 
+              </body>
+            </html>`;
 
-  const htmlDocument = `<!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <title>Neverwrote</title>
-        <link rel="stylesheet" type="text/css" href="/assets/css/app.css">
-        <script src="/assets/js/vendor.js"></script>
-        <script src="/assets/js/app.js"></script>
-      </head>
-      <body>
-        <div id="root"></div>
-        <script>main(${initialStateString});</script>
-      </body>
-    </html>`;
-
-  // Respond with the complete HTML page
-  res.send(htmlDocument);
-
-  });
-});
-
-// Catch-all for handling errors.
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  if(res.headersSent) {
-    return next(err);
-  }
-  const youch = new Youch(err, req);
-  youch.toHTML().then(html => res.send(html));
+          // Respond with the complete HTML page
+          res.send(htmlDocument);
+        } catch(ex) {
+          console.error(ex.stack);
+          res.status(500).send(ex.stack);
+        }
+    }).catch((err) => {
+      console.error(err.stack);
+      res.status(500).send('Request to API failed.');
+    });
+  }).catch((err) => {
+      console.error(err.stack);
+      res.status(500).send('Request to API failed.');
+    });
 });
 
 module.exports = app;

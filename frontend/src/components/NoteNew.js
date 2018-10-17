@@ -2,44 +2,44 @@ const React = require('react');
 const NoteEdit = require('./NoteEdit');
 
 
-class NoteNew extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { editing: false };
-  }
-
-  render() {
-    const openEdit = () => {
-      this.setState({ editing: true });
-    };
-
-    const closeEdit = () => {
-      this.setState({ editing: false });
-    };
-
-    const createNote = (newNote) => {
-      this.props.createNote(newNote, (err) => {
-        if(!err) closeEdit();
-      });
-    };
-
-    if(this.state.editing) {
-      return (
-        <NoteEdit
-          note={this.props.note}
-          onSave={createNote}
-          onCancel={closeEdit}
-          notebookId={this.props.notebookId}
-        />
+ // A button for new note
+const NoteNew = React.createClass({
+  displayName: 'NoteNew',
+  getInitialState: function() {
+    return { editing: false };
+  },
+  openEdit: function() {
+    this.setState({ editing: true });
+    console.log(this.props.notebookIdentification);
+  },
+  closeEdit: function() {
+    this.setState({ editing: false });
+  },
+  createNote: function(newNote) {
+    this.props.createNote(newNote, (err) => {
+      if(!err) this.closeEdit();
+    });
+  },
+  render: function() {
+    // To switch to edit mode when editing is clicked.
+    if(!this.state.editing){
+        return (
+        <button className="blog-load-more btn btn-primary btn-lg"
+          onClick={ this.openEdit }>
+          Write new Note
+        </button>
       );
+    }else{
+        return (
+           <NoteEdit
+          notebookIdentification={this.props.notebookIdentification}
+          note={this.props.note}
+          onSave={this.createNote}
+          onCancel={this.closeEdit}
+        />
+        );
     }
-
-    return (
-      <button onClick={ openEdit } >
-        + New note
-      </button>
-    );
   }
-}
+});
 
 module.exports = NoteNew;

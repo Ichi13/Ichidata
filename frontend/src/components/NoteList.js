@@ -1,74 +1,59 @@
 const React = require('react');
 const ReactRedux = require('react-redux');
-const _ = require('lodash');//*
+const _ = require('lodash');
 
-const createActionDispatchers = require('../helpers/createActionDispatchers');
 const notesActionCreators = require('../reducers/notes');
-const notebooksActionCreators = require('../reducers/notebooks');
-const Note = require('./Note');//*
-const NoteNew = require('./NoteNew');//*
-/*
-  *** TODO: Build more functionality into the NoteList component ***
-  At the moment, the NoteList component simply renders the notes
-  as a plain list containing their titles. This code is just a starting point,
-  you will need to build upon it in order to complete the assignment.
-*/
-class NoteList extends React.Component {
-  constructor(props) {//*
-    super(props);
-    this.state = { loading: false };
-  }
+const createActionDispatchers = require('../helpers/createActionDispatchers');
+const Note = require('./Note');
+const NoteNew = require('./NoteNew');
 
-  render() {
-    const onLoadButtonClick = () => {
-      if(!this.state.loading) {
-        this.setState({ loading: true });
-        this.props.loadMorePosts(() => {
-          this.setState({ loading: false });
-        });
-      }
-    };
-
-    const createNoteListItem = (note) => {
-
-     return (
+// A list of notes
+const NoteList = React.createClass({
+  displayName: 'NoteList',
+  // Setting initial state
+  getInitialState: function() {
+    return { loading: false };
+  },
+  // Function which creates a note component from a notebook ID
+  createNoteComponent: function(currentNote) {
+    console.log("Note id from notelist:" + this.props.notebookIdentification)
+    if(this.props.notebookIdentification == currentNote.notebookId){
+      return (
         <Note
-          key={note.id}
-          note={note}
-          saveNote={this.props.saveNote}
+          key={currentNote.id}
+          note={currentNote}
           deleteNote={this.props.deleteNote}
-          notebookId={this.props.notebooks.activeNotebookId}
-        />
+          saveNote={this.props.saveNote}
+      />
       );
-    };
-
+   }
+  },
+  render: function() {
     return (
       <div className="row">
         <div className="blog-main">
-          <h2>Notes</h2>
-          <NoteNew
-              createNote={this.props.createNote}
-              notebookId={this.props.notebooks.activeNotebookId}
-            />
+          {/* Button for writing a new note */}
+             <NoteNew
+            createNote={this.props.createNote}
+            notebookIdentification={this.props.notebookIdentification}
+          />
+          {/*Listing all notes*/}
 
-          <ul>
-            {this.props.notes.notes.map(createNoteListItem)}
-
-          </ul>
+          {_.map(this.props.notes.visibleNotes, x => this.createNoteComponent(x))}
         </div>
       </div>
-
     );
   }
-}
+});
 
+// Connect NoteList component to the Redux store
 const NoteListContainer = ReactRedux.connect(
-  state => ({
+  // Map store state to props
+  (state) => ({
     notes: state.notes,
-    notebooks: state.notebooks,
-    data: state.data,
+    time: state.time
   }),
-  createActionDispatchers(notesActionCreators, notebooksActionCreators)
+  createActionDispatchers(notesActionCreators)
 )(NoteList);
 
 module.exports = NoteListContainer;

@@ -1,45 +1,44 @@
 const React = require('react');
 const moment = require('moment');
 const NoteList = require('./NoteList');
-
-const NotebookMeta = (props) => {
-  return (
-    <div className="blog-notebook-meta">
-
-      <a role="button" title="Delete notebook"
-        onClick={props.onDelete}>
-      <span className="fa fa-remove" />
-        </a>
-    </div>
-  );
-};
-
-class NotebookView extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-
-  render() {
-      const onClickNotebook = (event) => {
-    	event.preventDefault();
-    	this.props.loadData(this.props.notebook.id);
-  };
-
-  return (
-    <div className="blog-notebook">
-      <h3 className="blog-notebook-title">
-        <a onClick={onClickNotebook}>
-        <li>{this.props.notebook.title}</li>
-        </a>
-      </h3>
-
-      <NotebookMeta {...this.props}/>
-    </div>
-  );
-};
-}
+const api = require('../helpers/api');
+/**
+ * Render edit/delete buttons and post timestamp.
+ */
+const NotebookMeta = ({ notebook, onDelete, onEdit }) => (
+  <div className="notebook-meta">
+  <a role="button" title="Delete notebook"
+    style={{ paddingRight: '8px' }}
+    onClick={ onDelete }
+  >
+  <span className="fa fa-remove" />
+  </a>
+   <a role="button" title="Edit post"
+      style={{ paddingRight: '8px' }}
+      onClick={ onEdit }
+    >
+      <span className="fa fa-edit" />
+    </a>
+     {/* TODO Task 7: Add a delete button */}
+  </div>
+);
 
 
+/**
+ * A read-only view of a notebook.
+ * This is a pure functional component.
+ * It takes props as its args and returns what the render method would return.
+  */
+  // Add code for delete
+const NotebookView = ({ notebook, onDelete, onEdit, showNotes }) => (
+  <div className="notebook">
+    <h2 className="notebook-title">
+      <a role="button" onClick={showNotes}>
+        {notebook.title}
+      </a>
+    </h2>
+    <NotebookMeta notebook={notebook} onEdit={onEdit} onDelete={onDelete}/>
+  </div>
+);
 
 module.exports = NotebookView;

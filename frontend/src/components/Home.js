@@ -1,23 +1,25 @@
 /**
- * This file contains the Home component.
- * Other React components for viewing notes and notebooks should be nested
- * beneath the Home component.
+ * The Home component contains the bulk of the user interface. Other React
+ * components for viewing notes and notebooks are nested beneath the Home
+ * component.
  */
 
 const React = require('react');
-
 const NotebookList = require('./NotebookList');
-const NoteList = require('./NoteList');
 
-const Home = () => (
-  <div className="container">
-    <h1>Neverwrote</h1>
-    <p>
-      Never say "I never wrote that down" ever again!
-    </p>
-    <NotebookList/>
-    <NoteList/>
-  </div>
-);
+/* *** TODO: Create and export the Home component from here *** */
+  const Home = () => (
+    <div>
+      {/* The heading area of the page */}
+      <div className="blog-header">
+        <h1 className="blog-title">Neverwrote</h1>
+        <p className="lead blog-description">Go easy on me</p>
+      </div>
+      {/* A list of blog posts, including a couple of buttons */}
+      <NotebookList/>
+    </div>
+  );
+
+
 
 module.exports = Home;

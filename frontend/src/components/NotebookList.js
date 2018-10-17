@@ -1,78 +1,53 @@
 const React = require('react');
 const ReactRedux = require('react-redux');
-const _ = require('lodash');//*
+const _ = require('lodash');
 
-const createActionDispatchers = require('../helpers/createActionDispatchers');
 const notebooksActionCreators = require('../reducers/notebooks');
-const Notebook = require('./Notebook');//*
-const ActiveNotebook = require('./ActiveNotebook');//*
-const NotebookView = require('./NotebookView');//*
-const NotebookNew = require('./NotebookNew');//*
-/*
-  *** TODO: Build more functionality into the NotebookList component ***
-  At the moment, the NotebookList component simply renders the notebooks
-  as a plain list containing their titles. This code is just a starting point,
-  you will need to build upon it in order to complete the assignment.
-*/
-class NotebookList extends React.Component {
-  constructor(props) {//*
-    super(props);
-    this.state = { loading: false };
-  }
+const createActionDispatchers = require('../helpers/createActionDispatchers');
+const Notebook = require('./Notebook');
+const NotebookNew = require('./NotebookNew');
 
-  render() {
-    const onLoadButtonClick = () => {
-      if(!this.state.loading) {
-        this.setState({ loading: true });
-        this.props.loadMorePosts(() => {
-          this.setState({ loading: false });
-        });
-      }
-    };
-
-    const createNotebookListItem = (notebook) => {
-     if(notebook.id === this.props.activeNotebookId) {
-     return (
-         <ActiveNotebook
-          key={Notebook.id}
-          Notebook={Notebook}
-          data={this.props.data}
-          />
-     );
-    }
-     return (
-         <Notebook
-          key={notebook.id}
-          notebook={notebook}
-          saveNotebook={this.props.saveNotebook}
-          loadData={this.props.loadData}
-          deleteNotebook={this.props.deleteNotebook}
-        />
-     );
-    }
-
+/**
+ * A list of blog posts, along with buttons for writing a new post
+ * and loading more posts.
+ */
+const NotebookList = React.createClass({
+  displayName: 'NotebookList',
+  // Function which creates a notebook component from a notebook ID
+  createNotebookComponent: function(currentNotebook) {
+      /* TODO Task 7: Add code for delete */
+    return (
+      <Notebook
+        key={currentNotebook.id}
+        notebook={currentNotebook}
+        deleteNotebook={this.props.deleteNotebook}
+        saveNotebook={this.props.saveNotebook}
+     />
+    );
+  },
+  render: function() {
     return (
       <div className="row">
         <div className="blog-main">
-          <h2>Notebooks</h2>
-          <NotebookNew
-              createNotebook={this.props.createNotebook}
+          {/* Button for writing a new notebook */}
+             <NotebookNew
+            createNotebook={this.props.createNotebook}
           />
-          <ul>
-            {this.props.notebooks.data.map(createNotebookListItem)}
-          </ul>
+          {/* TODO Task 2: Write code to list all the notebooks */}
+
+          {_.map(this.props.notebooks.visibleNotebooks, x => this.createNotebookComponent(x))}
         </div>
       </div>
-
     );
   }
-}
+});
 
+// Connect NotebookList component to the Redux store
 const NotebookListContainer = ReactRedux.connect(
-  state => ({
+  // Map store state to props
+  (state) => ({
     notebooks: state.notebooks,
-    activeNotebookId: state.activeNotebookId,
-    data: state.data,
+    time: state.time
   }),
   createActionDispatchers(notebooksActionCreators)
 )(NotebookList);

@@ -1,68 +1,71 @@
 const React = require('react');
 const _ = require('lodash');
-const MarkdownEditor = require('./MarkdownEditor');
 
-class NoteEdit extends React.Component {
-  constructor(props) {
-    super(props);
-    const note = props.note || {};
 
-    this.state = {
+ // A form for editing a Note.
+
+const NoteEdit = React.createClass({
+  displayName: 'NoteEdit',
+  getInitialState: function() {
+    const note = this.props.note || {};
+    return {
       title: note.title || '',
-      content: note.content || '',
+      content: post.content || ''
     };
-  }
-
-  render() {
-    const revertAndStopEditing = (event) => {
-      event.preventDefault();
-      this.props.onCancel();
-    };
-
-    const submitAndStopEditing = (event) => {
-      event.preventDefault();
-
-      const editedNote = {
-        title: this.state.title,
-        content: this.state.content,
-        notebookId: this.props.notebookId
-      };
-      this.props.onSave(editedNote);
-    };
-
-    const onTitleChange = (event) => {
-      this.setState({ title: event.target.value });
-    };
-
-    const onContentChange = (event) => {
-      this.setState({ content: event.target.value });
-    };
-
+  },
+  revertAndStopEditing: function(event) {
+    event.preventDefault();
+    this.props.onCancel();
+  },
+  submitAndStopEditing: function(event) {
+    event.preventDefault();
+    // Creates a new note object and saves it.
+    console.log(this.props.notebookIdentification);
+    const editedNote = _.assign({}, this.props.note, {
+      title: this.state.title,
+      content: this.state.content,
+      notebookId: this.props.notebookIdentification
+    });
+    this.props.onSave(editedNote);
+  },
+  onTitleChange: function(event) {
+    const title = event.target.value;
+    this.setState({ title });
+  },
+  render: function() {
     return (
-      <form className="blog-note">
+      <form className="blog-note" id="newNote">
+        {/* Title field */}
         <div className="form-group">
           <input className="form-control input-lg" value={this.state.title}
-            placeholder="Note title" onChange={onTitleChange}/>
+            placeholder="Note title" onChange={this.onTitleChange}
+          />
         </div>
-
-         <div className="form-group">
+        {/* Content field */}
+        <div className="form-group">
           <textarea
             className="form-control"
             style={{ height: 300 }}
             value={this.state.content}
-            onChange={onContentChange}
+            onChange={this.onContentChange}
           />
         </div>
-
+        {/* Save button */}
         <button className="btn btn-default pull-right"
-          onClick={submitAndStopEditing}>Save</button>
-
+          onClick={this.submitAndStopEditing}
+        >
+          Save
+        </button>
+        {/* Cancel button */}
         <button className="btn btn-default pull-right"
           style={{ marginRight: '12px' }}
-          onClick={revertAndStopEditing}>Cancel</button>
+          onClick={this.revertAndStopEditing}
+          >
+          Cancel
+        </button>
       </form>
     );
   }
-}
+});
 
 module.exports = NoteEdit;
